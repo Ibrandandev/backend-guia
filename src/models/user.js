@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const usuarioSchema = Schema({
+const UsuarioSchema = Schema({
   name: { type: String, required: [true, "El nombre es requerido"] },
   email: {
     type: String,
@@ -12,10 +12,10 @@ const usuarioSchema = Schema({
   role: {
     type: String,
     required: true,
-    enum: ["USER_ROLE", "ADMIN_ROLE"],
-    default: "USER_ROLE",
+    // enum: ["USER_ROLE", "ADMIN_ROLE"],
+    // default: "USER_ROLE",
   },
   state: { type: Boolean, default: true },
 });
 
-module.exports = model("User", usuarioSchema);
+module.exports = model("User", UsuarioSchema);
