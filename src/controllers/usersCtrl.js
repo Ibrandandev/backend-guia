@@ -4,10 +4,23 @@ const bcrypt = require("bcryptjs");
 
 const User = require("../models/user");
 
-const getUsers = (req = request, res = response) => {
-  const { apiKey, limit } = req.query;
+const getUsers = async (req = request, res = response) => {
+  const { from = 0, limit = 0 } = req.query;
 
-  res.json({ message: "Get Users!", apiKey, limit });
+  const query = { state: true };
+
+  // const users = await User.find().skip(from).limit(limit);
+  // const total = await User.countDocuments();
+
+  const [users, total] = await Promise.all([
+    User.find(query).skip(from).limit(limit),
+    User.countDocuments(query),
+  ]);
+
+  res.json({
+    users,
+    total,
+  });
 };
 const getUser = (req = request, res = response) => {
   const { id } = req.params;
@@ -23,15 +36,26 @@ const postUser = async (req = request, res = response) => {
   await user.save();
   res.json({ message: "El usuario se ha creado correctamente", user });
 };
-const putUser = (req = request, res = response) => {
+const putUser = async (req = request, res = response) => {
   const { id } = req.params;
+  const { password, ...userToUpdate } = req.body;
 
-  res.json({ message: `Put User! id:${id}` });
+  if (password) {
+    const salt = bcrypt.genSaltSync(10);
+    userToUpdate.password = bcrypt.hashSync(password, salt);
+  }
+
+  const user = await User.findByIdAndUpdate(id, userToUpdate, { new: true });
+
+  res.json({ message: `El usuario ha sido actualizado`, user });
 };
-const deleteUser = (req = request, res = response) => {
+
+const deleteUser = async (req = request, res = response) => {
   const { id } = req.params;
 
-  res.json({ message: `Delete User! id:${id}` });
+  const userToDelete = await User.findByIdAndDelete(id);
+
+  res.json({ message: `El usuario ha sido eliminado`, userToDelete });
 };
 
 module.exports = {

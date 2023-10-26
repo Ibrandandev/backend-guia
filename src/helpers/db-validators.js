@@ -15,7 +15,16 @@ const isValidRole = async (role) => {
   }
 };
 
+const isValidId = async (id) => {
+  const userExist = await User.findById(id);
+
+  if (!userExist) {
+    throw new Error(`El id ${ìd} no se encontró en la base de datos`);
+  }
+};
+
 module.exports = {
   isValidEmail,
   isValidRole,
+  isValidId,
 };
